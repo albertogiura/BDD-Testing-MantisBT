@@ -4,6 +4,7 @@ import io.cucumber.java.After;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import io.cucumber.mantis.pages.LoginPage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -14,6 +15,7 @@ import static org.junit.Assert.assertTrue;
 
 public class AuthenticationStepDefinitions {
     WebDriver driver = new ChromeDriver();
+    LoginPage loginPage = new LoginPage(driver);
     String current_user = "";
 
     @Given("a user that opens the login page")
@@ -23,37 +25,26 @@ public class AuthenticationStepDefinitions {
 
     @When("the user fills the fields with username {string} and password {string}")
     public void the_user_fills_the_fields_with_username_and_password(String username, String password) {
-
-        WebElement usernameTextBox = driver.findElement(By.id("username"));
-
-        usernameTextBox.sendKeys(username);
+        loginPage.enterUsername(username);
         current_user = username;
-
-        driver.findElement(By.xpath("//input[@type = 'submit']")).click();
-
-        WebElement pwdTextBox = driver.findElement(By.id("password"));
-
-        pwdTextBox.sendKeys(password);
-
-        driver.findElement(By.xpath("//input[@type = 'submit']")).click();
+        loginPage.enterPassword(password);
     }
 
     @Then("the user reaches the dashboard page")
     public void the_user_reaches_the_dashboard_page() {
-        //assertEquals("http://127.0.0.1/mantisbt/my_view_page.php", driver.getCurrentUrl());
-        assertEquals(current_user, driver.findElement(By.className("user-info")).getText());
+        assertEquals(current_user, loginPage.getCurrentUser());
         current_user = "";
     }
 
     @Then("the user is provided with a error message")
     public void theUserIsProvidedWithAErrorMessage() {
-        assertTrue(driver.findElement(By.className("alert-danger")).isDisplayed());
+        assertTrue(loginPage.isAlertMessageDisplayed());
     }
 
     /*@After
     public void closeBrowser()
     {
         // Close browser window
-        driver.quit();
+        //driver.quit();
     }*/
 }
